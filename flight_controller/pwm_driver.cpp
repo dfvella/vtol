@@ -42,6 +42,8 @@ void pwmDevice::low()
     digitalWrite(pin, LOW);
 }
 
+pwmScheduler::pwmScheduler() { }
+
 void pwmScheduler::add_device(uint8_t ind, pwmDevice* device)
 {
     sorted_devices[ind] = device;
@@ -49,7 +51,7 @@ void pwmScheduler::add_device(uint8_t ind, pwmDevice* device)
     devices[ind]->begin();
 }
 
-void pwmScheduler::set_signal(uint8_t ind, uint8_t signal)
+void pwmScheduler::set_signal(uint8_t ind, uint16_t signal)
 {
     devices[ind]->set_signal(signal);
 }
@@ -85,7 +87,6 @@ void pwmScheduler::write_all()
     // Write all the servo output pins low
     for (uint8_t i = 0; i < NUM_DEVICES; ++i) 
         sorted_devices[i]->low();
-
 }
 
 

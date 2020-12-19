@@ -38,16 +38,6 @@
 #define ELE_PIN 10
 #define LED_PIN 13
 
-
-
-const uint8_t THR = 0;
-const uint8_t RTS = 1;
-const uint8_t RBS = 2;
-const uint8_t LTS = 3;
-const uint8_t LBS = 4;
-const uint8_t NUM_SERVOS = 5;
-Servo *servo[NUM_SERVOS];
-
 unsigned long timer = 0;
 const int LOOP_TIME = 5000; // microseconds
 

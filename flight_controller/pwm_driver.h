@@ -7,23 +7,23 @@
 #define RIGHT_MOTOR_MIN_PULSE 1100
 #define RIGHT_MOTOR_MAX_PULSE 1900
 
-#define RIGHT_TILT_MIN_PULSE 1100
-#define RIGHT_TILT_MAX_PULSE 1900
+#define RIGHT_TILT_MIN_PULSE 1000
+#define RIGHT_TILT_MAX_PULSE 2000
 
-#define RIGHT_ALR_MIN_PULSE 1100
-#define RIGHT_ALR_MAX_PULSE 1900
+#define RIGHT_ALR_MIN_PULSE 1200
+#define RIGHT_ALR_MAX_PULSE 1700
 
 #define LEFT_MOTOR_MIN_PUSLE 1100
 #define LEFT_MOTOR_MAX_PULSE 1900
 
-#define LEFT_TILT_MIN_PULSE 1100
-#define LEFT_TILT_MAX_PULSE 1900
+#define LEFT_TILT_MIN_PULSE 1000
+#define LEFT_TILT_MAX_PULSE 2000
 
-#define LEFT_ALR_MIN_PULSE 1100
-#define LEFT_ALR_MAX_PULSE 1900
+#define LEFT_ALR_MIN_PULSE 1300
+#define LEFT_ALR_MAX_PULSE 1800
 
-#define ELE_MIN_PULSE 1100
-#define ELE_MAX_PULSE 1900
+#define ELE_MIN_PULSE 1300
+#define ELE_MAX_PULSE 1700
 
 class pwmDevice
 {
@@ -62,7 +62,7 @@ public:
     pwmScheduler();
 
     void add_device(uint8_t ind, pwmDevice* device);
-    void set_signal(uint8_t ind, uint8_t signal);
+    void set_signal(uint8_t ind, uint16_t signal);
     void write_all();
 
     static constexpr uint8_t RESC_IND = 0;
