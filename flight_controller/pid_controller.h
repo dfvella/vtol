@@ -1,14 +1,10 @@
-/* 
- * PID controller class for calculating the servo output signal /
- * control surfrace deflection based on current imu readings.
- */
-
-#ifndef PID_H
-#define PID_H
+#ifndef PID_CONTROLLER_H
+#define PID_CONTROLLER_H
 
 #include <Arduino.h>
 
 #define MICROSEC_PER_SEC 1000000.0
+#define PID_INITIAL_OUTPUT 1500
 
 class PIDcontroller
 {
@@ -23,4 +19,4 @@ class PIDcontroller
         unsigned long timer;
 };
 
-#endif
+#endif // PID_CONTROLLER_H

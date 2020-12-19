@@ -1,10 +1,5 @@
-/* 
-* PID controller class for calculating the servo output signal /
-* control surfrace deflection based on current imu readings.
-*/
-
-#include "pid.h"
-#include "servo.h"
+#include "pid_controller.h"
+#include "pwm_driver.h"
 
 PIDcontroller::PIDcontroller(float p_in, float i_in, float d_in, float i_max_in) 
     : p(p_in), i(i_in), d(d_in), i_max(i_max_in), i_output(0) { }
@@ -17,7 +12,7 @@ float PIDcontroller::calculate(float error)
         timer = micros();
         start = false;
 
-        return Servo::CENTER;
+        return PID_INITIAL_OUTPUT;
     }
     else 
     {

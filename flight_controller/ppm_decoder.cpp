@@ -1,9 +1,4 @@
-/*
- * Class for decoding ppm signals sent from the RF receiver
- * using interrupts
- */ 
-
-#include "ppm.h"
+#include "ppm_decoder.h"
 
 
 ppmDecoder::ppmDecoder() : sync_ptr(data), chan_ptr(data) { }

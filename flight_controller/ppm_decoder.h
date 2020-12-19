@@ -1,10 +1,5 @@
-/*
- * Class for decoding ppm signals sent from the RF receiver
- * using interrupts
- */ 
-
-#ifndef PPM_H
-#define PPM_H
+#ifndef PPM_DECODER_H
+#define PPM_DECODER_H
 
 #include <Arduino.h>
 
@@ -56,14 +51,10 @@ class ppmDecoder
 // Macro defined so compiler can deduce instance of ppmDecoder class
 #define assignPpmDecoderToPin(handler, pin) \
     pinMode(pin, INPUT_PULLUP); \
-    attachInterrupt( \
-        digitalPinToInterrupt(pin), \
-        [](void){ handler.toggle(); }, \
-        CHANGE \
-    );
+    attachInterrupt(digitalPinToInterrupt(pin), [](void){ handler.toggle(); }, CHANGE);
 
 // Disassociates an instance of the ppmDecoder class with a pin
 #define removePpmDecoderFromPin(handler, pin) \
     detachInterrupt(pin);
 
-#endif
+#endif // PPM_DECODER_H
