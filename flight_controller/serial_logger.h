@@ -3,49 +3,30 @@
 
 #include <Arduino.h>
 
-#define SERIAL_BAUD_RATE 9600
-
-//#define PRINT_RAW_GYRO
-//#define PRINT_RAW_ACCEL
+//#define PRINT_LOOP_TIME
 //#define PRINT_IMU_ANGLES
 //#define PRINT_PPM_INPUTS
-//#define PRINT_MIXED_OUTPUTS
-//#define PRINT_PID_OUTPUTS
+//#define PRINT_CONTROLLER_TARGETS
+//#define PRINT_CONTROLLER_OUTPUTS
 //#define PRINT_FLIGHT_MODE
-//#define PRINT_LOOP_TIME
+//#define PRINT_CONTROL_MODE
 
-#ifdef PRINT_RAW_GYRO
+#ifdef PRINT_LOOP_TIME
 #define DO_LOGGING
-#define print_raw_gyro() \
-    Serial.print(imu.get_raw(Imu::GYROX)); \
-    Serial.print(' '); \
-    Serial.print(imu.get_raw(Imu::GYROY)); \
-    Serial.print(' '); \
-    Serial.println(imu.get_raw(Imu::GYROZ));
-#else
-#define print_raw_gyro()
-#endif 
-
-#ifdef PRINT_RAW_ACCEL
-#define DO_LOGGING
-#define print_raw_accel() \
-    Serial.print(imu.get_raw(Imu::ACCELX)); \
-    Serial.print(' '); \
-    Serial.print(imu.get_raw(Imu::ACCELY)); \
-    Serial.print(' '); \
-    Serial.println(imu.get_raw(Imu::ACCELZ));
-#else
-#define print_raw_accel()
-#endif 
+#define print_loop_time() \
+    Serial.println(micros() - timer);
+#else 
+#define print_loop_time()
+#endif
 
 #ifdef PRINT_IMU_ANGLES
 #define DO_LOGGING
 #define print_imu_angles() \
-    Serial.print(imu.roll()); \
+    Serial.print(flight_controller.get_roll_angle()); \
     Serial.print(' '); \
-    Serial.print(imu.pitch()); \
+    Serial.print(flight_controller.get_pitch_angle()); \
     Serial.print(' '); \
-    Serial.println(imu.yaw());
+    Serial.println(flight_controller.get_yaw_angle());
 #else 
 #define print_imu_angles() 
 #endif
@@ -68,55 +49,62 @@
 #define print_ppm_inputs()
 #endif
 
-#ifdef PRINT_MIXED_OUTPUTS
+#ifdef PRINT_CONTROLLER_TARGETS
 #define DO_LOGGING
-#define print_mixed_outputs() \
-    Serial.print(servo[RTS]->get()); \
+#define print_controller_targets() \
+    Serial.print(flight_controller.get_target_roll()); \
     Serial.print(' '); \
-    Serial.print(servo[RBS]->get()); \
+    Serial.print(flight_controller.get_target_pitch()); \
     Serial.print(' '); \
-    Serial.print(servo[LTS]->get()); \
-    Serial.print(' '); \
-    Serial.println(servo[LBS]->get());
+    Serial.println(flight_controller.get_target_yaw());
 #else 
-#define print_mixed_outputs()
+#define print_controller_targets()
 #endif
 
-#ifdef PRINT_PID_OUTPUTS
+#ifdef PRINT_CONTROLLER_OUTPUTS
 #define DO_LOGGING
-#define print_pid_outputs() \
-    Serial.print(ele_out); \
+#define print_controller_outputs() \
+    Serial.print(controller_output.right_motor); \
     Serial.print(' '); \
-    Serial.println(arl_out);
+    Serial.print(controller_output.right_tilt); \
+    Serial.print(' '); \
+    Serial.print(controller_output.right_alr); \
+    Serial.print(' '); \
+    Serial.print(controller_output.left_motor); \
+    Serial.print(' '); \
+    Serial.print(controller_output.left_tilt); \
+    Serial.print(' '); \
+    Serial.print(controller_output.left_alr); \
+    Serial.print(' '); \
+    Serial.println(controller_output.elevator);
 #else 
-#define print_pid_outputs()
+#define print_controller_outputs()
 #endif
 
 #ifdef PRINT_FLIGHT_MODE
 #define DO_LOGGING
 #define print_flight_mode() \
-    Serial.println(fmode);
+    Serial.println((uint8_t)flight_controller.get_flight_mode());
 #else 
 #define print_flight_mode()
 #endif
 
-#ifdef PRINT_LOOP_TIME
+#ifdef PRINT_CONTROL_MODE
 #define DO_LOGGING
-#define print_loop_time() \
-    Serial.println(loop_time);
+#define print_control_mode() \
+    Serial.println((uint8_t)flight_controller.get_control_mode());
 #else 
-#define print_loop_time()
+#define print_control_mode()
 #endif
 
 #define print_log() \
-    print_raw_gyro() \
-    print_raw_accel() \
+    print_loop_time() \
     print_imu_angles() \
     print_ppm_inputs() \
-    print_mixed_outputs() \
-    print_pid_outputs() \
+    print_controller_targets() \
+    print_controller_outputs() \
     print_flight_mode() \
-    print_loop_time()
+    print_control_mode()
 
 #ifdef DO_LOGGING
 #define SERIAL_CONNECTION

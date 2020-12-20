@@ -7,21 +7,22 @@
 #include "pid_controller.h"
 
 // forward control map gains
-#define FORWARD_YAW_DIFFERENTIAL 0.1
+#define FORWARD_YAW_DIFFERENTIAL 0.5
 #define FORWARD_RIGHT_TILT 1000
 #define FORWARD_LEFT_TILT 1000
 
 // slow control map gains
-#define SLOW_YAW_DIFFERENTIAL 0.05
-#define SLOW_ROLL_DIFFERENTIAL 0.05
+#define SLOW_YAW_DIFFERENTIAL 0.1
+#define SLOW_ROLL_DIFFERENTIAL 0.1
 #define SLOW_FLAPS_TRIM 100
 #define SLOW_RIGHT_TILT 1500
 #define SLOW_LEFT_TILT 1500
 
 // verital control map gains
-#define VERTICAL_ROLL_DIFFERENTIAL 0.01
-#define VERTICAL_YAW_MOTOR_TILT 0.1
-#define VERTICAL_FLAPS_TRIM 100
+#define VERTICAL_ROLL_DIFFERENTIAL 0.2
+#define VERTICAL_YAW_MOTOR_TILT 0.2
+#define VERTICAL_PITCH_MOTOR_TILT 0.2
+#define VERTICAL_FLAPS_TRIM 1400
 #define VERTICAL_RIGHT_TILT 2000
 #define VERTICAL_LEFT_TILT 2000
 
@@ -29,9 +30,14 @@
 #define AUTO_MAX_ROLL_ANGLE 40
 #define AUTO_MAX_PITCH_ANGLE 40
 
-#define RATE_MAX_ROLL_RATE 3.6 // units: deg per 20 ms
-#define RATE_MAX_PITCH_RATE 3.6
-#define RATE_MAX_YAW_RATE 3.6
+// use different rates for different flight modes
+#define RATE_MAX_ROLL_RATE 1.8 // units: deg per 20 ms
+#define RATE_MAX_PITCH_RATE 1.8
+#define RATE_MAX_YAW_RATE 1.8
+
+// for noise redution
+#define DEAD_STICK 20 // microseconds
+#define NUETRAL_STICK 1500
 
 // Roll PID gains
 #define ROLL_P 8 // was 10, 12
@@ -89,6 +95,13 @@ public:
     float get_target_roll();
     float get_target_pitch();
     float get_target_yaw();
+
+    float get_roll_angle();
+    float get_pitch_angle();
+    float get_yaw_angle();
+
+    Control_Mode get_control_mode();
+    Flight_Mode get_flight_mode();
 
 private:
     void determine_mode(Input& input);

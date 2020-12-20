@@ -4,7 +4,9 @@
 #include <Arduino.h>
 
 #define MICROSEC_PER_SEC 1000000.0
+
 #define PID_INITIAL_OUTPUT 1500
+#define PID_MAX_OUTPUT 500
 
 class PIDcontroller
 {

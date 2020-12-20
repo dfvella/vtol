@@ -6,7 +6,7 @@
 
 #include "serial_logger.h"
 
-//#define ENABLE_SERVOS
+#define ENABLE_SERVOS
 
 // Pin assignments
 #define PPM_PIN 3
@@ -41,7 +41,7 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
 
     #ifdef SERIAL_CONNECTION
-    Serial.begin(SERIAL_BAUD_RATE);
+    Serial.begin(9600);
     Serial.println("Serial connection");
     #endif
 
@@ -114,10 +114,6 @@ void loop()
         state = Controller_State::PPMSYNC;
         break;
     }
-
-    #ifdef PRINT_LOOP_TIME
-    uint16_t loop_time = micros() - timer;
-    #endif
 
     #ifdef DO_LOGGING
     print_log()

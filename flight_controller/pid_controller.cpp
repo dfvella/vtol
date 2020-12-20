@@ -30,6 +30,8 @@ float PIDcontroller::calculate(float error)
         output += d * ((error - prev_error) / t_delta) * MICROSEC_PER_SEC;
         prev_error = error;
 
+        output = constrain(output, -1 * PID_MAX_OUTPUT, PID_MAX_OUTPUT);
+
         return output;
     }
 }
