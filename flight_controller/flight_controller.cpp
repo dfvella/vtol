@@ -84,15 +84,15 @@ void Flight_Controller::calculate_targets(Input& input)
     switch (control_mode)
     {
     case Control_Mode::AUTOLEVEL:
-        target_roll = interpolate(input.roll, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * AUTO_MAX_ROLL_ANGLE, AUTO_MAX_ROLL_ANGLE);
-        target_pitch = interpolate(input.pitch, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * AUTO_MAX_PITCH_ANGLE, AUTO_MAX_PITCH_ANGLE);
-        target_yaw += interpolate(input.yaw, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_YAW_RATE, RATE_MAX_YAW_RATE);
+        target_roll = -1 * interpolate(input.roll, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * AUTO_MAX_ROLL_ANGLE, AUTO_MAX_ROLL_ANGLE);
+        target_pitch = -1 * interpolate(input.pitch, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * AUTO_MAX_PITCH_ANGLE, AUTO_MAX_PITCH_ANGLE);
+        target_yaw += -1 * interpolate(input.yaw, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_YAW_RATE, RATE_MAX_YAW_RATE);
         break;
 
     case Control_Mode::RATE:
-        target_roll += interpolate(input.roll, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_ROLL_RATE, RATE_MAX_ROLL_RATE);
-        target_pitch += interpolate(input.pitch, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_PITCH_RATE, RATE_MAX_PITCH_RATE);
-        target_yaw += interpolate(input.yaw, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_YAW_RATE, RATE_MAX_YAW_RATE);
+        target_roll += -1 * interpolate(input.roll, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_ROLL_RATE, RATE_MAX_ROLL_RATE);
+        target_pitch += -1 * interpolate(input.pitch, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_PITCH_RATE, RATE_MAX_PITCH_RATE);
+        target_yaw += -1 * interpolate(input.yaw, MIN_PWM_PULSEWIDTH, MAX_PWM_PULSEWIDTH, -1 * RATE_MAX_YAW_RATE, RATE_MAX_YAW_RATE);
         break;
 
     case Control_Mode::MANUAL:
@@ -124,16 +124,16 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
     switch (flight_mode)
     {
     case Flight_Mode::FORWARD:
-        output.right_motor = input.throttle + (FORWARD_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
-        output.left_motor = input.throttle - (FORWARD_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
+        output.right_motor = input.throttle - (FORWARD_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
+        output.left_motor = input.throttle + (FORWARD_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
 
-        output.right_alr = input.roll;
-        output.left_alr = input.roll;
+        output.right_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll;
+        output.left_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll;
 
         output.right_tilt = FORWARD_RIGHT_TILT;
         output.left_tilt = FORWARD_LEFT_TILT;
 
-        output.elevator = input.pitch;
+        output.elevator = NUETRAL_STICK + (NUETRAL_STICK - (int16_t)input.pitch);
         break;
     
     case Flight_Mode::SLOW:
@@ -141,32 +141,56 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
         output.right_motor = input.throttle + (SLOW_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
         output.left_motor = input.throttle - (SLOW_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
 
-        output.right_alr = input.roll + SLOW_FLAPS_TRIM;
-        output.left_alr = input.roll - SLOW_FLAPS_TRIM;
+        output.right_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll + SLOW_FLAPS_TRIM;
+        output.left_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll - SLOW_FLAPS_TRIM;
 
         // add elevator into tilt
         output.right_tilt = SLOW_RIGHT_TILT;
         output.left_tilt = SLOW_LEFT_TILT;
 
-        output.elevator = input.pitch;
+        output.elevator = NUETRAL_STICK + (NUETRAL_STICK - (int16_t)input.pitch);
         break;
 
     case Flight_Mode::VERTICAL:
-        output.right_motor = input.throttle + (VERTICAL_ROLL_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.roll));
-        output.left_motor = input.throttle - (VERTICAL_ROLL_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.roll));
+        output.right_motor = input.throttle - (VERTICAL_ROLL_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.roll));
+        output.left_motor = input.throttle + (VERTICAL_ROLL_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.roll));
 
-        output.right_alr = VERTICAL_FLAPS_TRIM;
-        output.left_alr = VERTICAL_FLAPS_TRIM;
+        output.right_alr = NUETRAL_STICK + VERTICAL_FLAPS_TRIM;
+        output.left_alr = NUETRAL_STICK - VERTICAL_FLAPS_TRIM;
 
         output.right_tilt = VERTICAL_RIGHT_TILT + (VERTICAL_YAW_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.yaw))
                                                 + (VERTICAL_PITCH_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.pitch));
-        output.left_tilt = VERTICAL_LEFT_TILT - (VERTICAL_YAW_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.yaw))
-                                              - (VERTICAL_PITCH_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.yaw));
+        output.left_tilt = VERTICAL_LEFT_TILT + (VERTICAL_YAW_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.yaw))
+                                              - (VERTICAL_PITCH_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.pitch));
 
-        output.elevator = input.pitch;
+        output.elevator = NUETRAL_STICK + (NUETRAL_STICK - (int16_t)input.pitch);
         break;
     }
-}
+    
+    // if (output.elevator < CENTER_ELEVATOR)
+    //     output.elevator = interpolate(output.elevator, MIN_PWM_PULSEWIDTH, DEAD_STICK, MIN_ELEVATOR_THROW, CENTER_ELEVATOR);
+    // else
+    //     output.elevator = interpolate(output.elevator, DEAD_STICK, MAX_PWM_PULSEWIDTH, CENTER_ELEVATOR, MAX_ELEVATOR_THROW);
+
+    // if (output.right_alr < CENTER_RIGHT_ALR)
+    //     output.right_alr = interpolate(output.right_alr, MIN_PWM_PULSEWIDTH, DEAD_STICK, MIN_RIGHT_ALR_THROW, CENTER_RIGHT_ALR);
+    // else
+    //     output.right_alr = interpolate(output.right_alr, DEAD_STICK, MAX_PWM_PULSEWIDTH, CENTER_RIGHT_ALR, MAX_RIGHT_ALR_THROW);
+
+    // if (output.left_alr < CENTER_LEFT_ALR)
+    //     output.left_alr = interpolate(output.left_alr, MIN_PWM_PULSEWIDTH, DEAD_STICK, MIN_LEFT_ALR_THROW, CENTER_LEFT_ALR);
+    // else
+    //     output.left_alr = interpolate(output.left_alr, DEAD_STICK, MAX_PWM_PULSEWIDTH, CENTER_LEFT_ALR, MAX_LEFT_ALR_THROW);
+
+    if (flight_mode != Flight_Mode::VERTICAL /* || right_tilt_last < TILT_TRANSITION_THRESHOLD */)
+    {
+        output.right_tilt = constrain(output.right_tilt, right_tilt_last - TILT_TRANSITION_DAMPER, right_tilt_last + TILT_TRANSITION_DAMPER);
+        output.left_tilt = constrain(output.left_tilt, left_tilt_last - TILT_TRANSITION_DAMPER, left_tilt_last + TILT_TRANSITION_DAMPER);
+    }
+
+    right_tilt_last = output.right_tilt;
+    left_tilt_last = output.left_tilt;
+} 
 
 float Flight_Controller::get_target_roll()
 {
