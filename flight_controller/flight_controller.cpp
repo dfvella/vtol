@@ -53,21 +53,21 @@ void Flight_Controller::calculate_pids(Input& input, Input& output)
 {
     calculate_targets(input);
 
+    output.throttle = input.throttle;
+
     switch (control_mode)
     {
     case Control_Mode::MANUAL:
-        output = input;
+        output.roll = input.roll;
+        output.pitch = input.pitch;
+        output.yaw = input.yaw;
         break;
+
     default:
         // add seperate pid controllers for different flight modes
-        output = {
-            input.throttle,
-            (uint16_t)roll_pid.calculate(imu.roll() - target_roll + ROLL_PID_TRIM) + NUETRAL_STICK,
-            (uint16_t)pitch_pid.calculate(imu.pitch() - target_pitch + PITCH_PID_TRIM) + NUETRAL_STICK,
-            (uint16_t)yaw_pid.calculate(imu.yaw() - target_yaw + YAW_PID_TRIM) + NUETRAL_STICK,
-            input.gear,
-            input.aux
-        };
+        output.roll = (uint16_t)roll_pid.calculate(imu.roll() - target_roll + ROLL_PID_TRIM) + NUETRAL_STICK;
+        output.pitch = (uint16_t)pitch_pid.calculate(imu.pitch() - target_pitch + PITCH_PID_TRIM) + NUETRAL_STICK;
+        output.yaw = (uint16_t)yaw_pid.calculate(imu.yaw() - target_yaw + YAW_PID_TRIM) + NUETRAL_STICK;
         break;
     }
 }
