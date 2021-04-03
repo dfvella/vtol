@@ -166,7 +166,16 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
         output.elevator = NEUTRAL_STICK + (NEUTRAL_STICK - (int16_t)input.pitch);
         break;
     }
-    
+
+    // for safety: make sure only to spin up motors when throttle is applied.
+    // without this flight controller could command motors for control about another axis
+    // even if there is no throttle input.
+    if (abs(input.throttle - NEUTRAL_THROTTLE) < DEAD_STICK)
+    {
+        output.right_motor = RIGHT_MOTOR_MIN_PULSE;
+        output.left_motor = LEFT_MOTOR_MIN_PULSE;
+    }
+
     // if (output.elevator < CENTER_ELEVATOR)
     //     output.elevator = interpolate(output.elevator, MIN_PWM_PULSEWIDTH, DEAD_STICK, MIN_ELEVATOR_THROW, CENTER_ELEVATOR);
     // else

@@ -4,11 +4,12 @@
 #include <Arduino.h>
 
 #include "imu_driver.h"
+#include "pwm_driver.h"
 #include "pid_controller.h"
 
 // forward control map gains
 #define FORWARD_YAW_DIFFERENTIAL 0.5
-#define FORWARD_RIGHT_TILT 1000
+#define FORWARD_RIGHT_TILT 940
 #define FORWARD_LEFT_TILT 2050
 
 // slow control map gains
@@ -24,7 +25,7 @@
 #define VERTICAL_PITCH_MOTOR_TILT 0.8
 #define VERTICAL_FLAPS_TRIM -100
 #define VERTICAL_RIGHT_TILT 1860
-#define VERTICAL_LEFT_TILT 1160
+#define VERTICAL_LEFT_TILT 1220
 
 // autolevel attitude limits
 #define AUTO_MAX_ROLL_ANGLE 40
@@ -38,6 +39,7 @@
 // for noise reduction
 #define DEAD_STICK 20 // microseconds
 #define NEUTRAL_STICK 1500
+#define NEUTRAL_THROTTLE 1000
 
 // vertical mode pid gains
 #define ROLL_P_VERTICAL 7 // was 8
