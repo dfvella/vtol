@@ -18,7 +18,7 @@
 #define SLOW_RIGHT_TILT 1500
 #define SLOW_LEFT_TILT 1500
 
-// verital control map gains
+// vertical control map gains
 #define VERTICAL_ROLL_DIFFERENTIAL 0.4
 #define VERTICAL_YAW_MOTOR_TILT 0.6
 #define VERTICAL_PITCH_MOTOR_TILT 0.8
@@ -35,9 +35,9 @@
 #define RATE_MAX_PITCH_RATE 0.5
 #define RATE_MAX_YAW_RATE 1.0
 
-// for noise redution
+// for noise reduction
 #define DEAD_STICK 20 // microseconds
-#define NUETRAL_STICK 1500
+#define NEUTRAL_STICK 1500
 
 // vertical mode pid gains
 #define ROLL_P_VERTICAL 7 // was 8
@@ -189,8 +189,8 @@ private:
     float target_pitch = 0;
     float target_yaw = 0;
 
-    uint16_t right_tilt_last = NUETRAL_STICK;
-    uint16_t left_tilt_last = NUETRAL_STICK;
+    uint16_t right_tilt_last = NEUTRAL_STICK;
+    uint16_t left_tilt_last = NEUTRAL_STICK;
 };
 
 #endif // FLIGHT_CONTROLLER_H

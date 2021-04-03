@@ -64,22 +64,22 @@ void Flight_Controller::calculate_pids(Input& input, Input& output)
         break;
 
     default:
-        // add seperate pid controllers for different flight modes
-        output.roll = (uint16_t)roll_pid.calculate(imu.roll() - target_roll + ROLL_PID_TRIM) + NUETRAL_STICK;
-        output.pitch = (uint16_t)pitch_pid.calculate(imu.pitch() - target_pitch + PITCH_PID_TRIM) + NUETRAL_STICK;
-        output.yaw = (uint16_t)yaw_pid.calculate(imu.yaw() - target_yaw + YAW_PID_TRIM) + NUETRAL_STICK;
+        // add separate pid controllers for different flight modes
+        output.roll = (uint16_t)roll_pid.calculate(imu.roll() - target_roll + ROLL_PID_TRIM) + NEUTRAL_STICK;
+        output.pitch = (uint16_t)pitch_pid.calculate(imu.pitch() - target_pitch + PITCH_PID_TRIM) + NEUTRAL_STICK;
+        output.yaw = (uint16_t)yaw_pid.calculate(imu.yaw() - target_yaw + YAW_PID_TRIM) + NEUTRAL_STICK;
         break;
     }
 }
 
 void Flight_Controller::calculate_targets(Input& input)
 {
-    if (abs(NUETRAL_STICK - (int16_t)input.roll) < DEAD_STICK)
-        input.roll = NUETRAL_STICK;
-    if (abs(NUETRAL_STICK - (int16_t)input.pitch) < DEAD_STICK)
-        input.pitch = NUETRAL_STICK;
-    if (abs(NUETRAL_STICK - (int16_t)input.yaw) < DEAD_STICK)
-        input.yaw = NUETRAL_STICK;
+    if (abs(NEUTRAL_STICK - (int16_t)input.roll) < DEAD_STICK)
+        input.roll = NEUTRAL_STICK;
+    if (abs(NEUTRAL_STICK - (int16_t)input.pitch) < DEAD_STICK)
+        input.pitch = NEUTRAL_STICK;
+    if (abs(NEUTRAL_STICK - (int16_t)input.yaw) < DEAD_STICK)
+        input.yaw = NEUTRAL_STICK;
 
     switch (control_mode)
     {
@@ -124,46 +124,46 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
     switch (flight_mode)
     {
     case Flight_Mode::FORWARD:
-        output.right_motor = input.throttle - (FORWARD_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
-        output.left_motor = input.throttle + (FORWARD_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
+        output.right_motor = input.throttle - (FORWARD_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
+        output.left_motor = input.throttle + (FORWARD_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
 
-        output.right_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll;
-        output.left_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll;
+        output.right_alr = (2 * NEUTRAL_STICK) - (int16_t)input.roll;
+        output.left_alr = (2 * NEUTRAL_STICK) - (int16_t)input.roll;
 
         output.right_tilt = FORWARD_RIGHT_TILT;
         output.left_tilt = FORWARD_LEFT_TILT;
 
-        output.elevator = NUETRAL_STICK + (NUETRAL_STICK - (int16_t)input.pitch);
+        output.elevator = NEUTRAL_STICK + (NEUTRAL_STICK - (int16_t)input.pitch);
         break;
     
     case Flight_Mode::SLOW:
         // add aileron into mix thrust differential
-        output.right_motor = input.throttle + (SLOW_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
-        output.left_motor = input.throttle - (SLOW_YAW_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.yaw));
+        output.right_motor = input.throttle + (SLOW_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
+        output.left_motor = input.throttle - (SLOW_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
 
-        output.right_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll + SLOW_FLAPS_TRIM;
-        output.left_alr = (2 * NUETRAL_STICK) - (int16_t)input.roll - SLOW_FLAPS_TRIM;
+        output.right_alr = (2 * NEUTRAL_STICK) - (int16_t)input.roll + SLOW_FLAPS_TRIM;
+        output.left_alr = (2 * NEUTRAL_STICK) - (int16_t)input.roll - SLOW_FLAPS_TRIM;
 
         // add elevator into tilt
         output.right_tilt = SLOW_RIGHT_TILT;
         output.left_tilt = SLOW_LEFT_TILT;
 
-        output.elevator = NUETRAL_STICK + (NUETRAL_STICK - (int16_t)input.pitch);
+        output.elevator = NEUTRAL_STICK + (NEUTRAL_STICK - (int16_t)input.pitch);
         break;
 
     case Flight_Mode::VERTICAL:
-        output.right_motor = input.throttle - (VERTICAL_ROLL_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.roll));
-        output.left_motor = input.throttle + (VERTICAL_ROLL_DIFFERENTIAL * (NUETRAL_STICK - (int16_t)input.roll));
+        output.right_motor = input.throttle - (VERTICAL_ROLL_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.roll));
+        output.left_motor = input.throttle + (VERTICAL_ROLL_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.roll));
 
-        output.right_alr = NUETRAL_STICK + VERTICAL_FLAPS_TRIM;
-        output.left_alr = NUETRAL_STICK - VERTICAL_FLAPS_TRIM;
+        output.right_alr = NEUTRAL_STICK + VERTICAL_FLAPS_TRIM;
+        output.left_alr = NEUTRAL_STICK - VERTICAL_FLAPS_TRIM;
 
-        output.right_tilt = VERTICAL_RIGHT_TILT + (VERTICAL_YAW_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.yaw))
-                                                + (VERTICAL_PITCH_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.pitch));
-        output.left_tilt = VERTICAL_LEFT_TILT + (VERTICAL_YAW_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.yaw))
-                                              - (VERTICAL_PITCH_MOTOR_TILT * (NUETRAL_STICK - (int16_t)input.pitch));
+        output.right_tilt = VERTICAL_RIGHT_TILT + (VERTICAL_YAW_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.yaw))
+                                                + (VERTICAL_PITCH_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.pitch));
+        output.left_tilt = VERTICAL_LEFT_TILT + (VERTICAL_YAW_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.yaw))
+                                              - (VERTICAL_PITCH_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.pitch));
 
-        output.elevator = NUETRAL_STICK + (NUETRAL_STICK - (int16_t)input.pitch);
+        output.elevator = NEUTRAL_STICK + (NEUTRAL_STICK - (int16_t)input.pitch);
         break;
     }
     
