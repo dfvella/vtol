@@ -1,37 +1,17 @@
 #include "pid_controller.h"
 
-PIDcontroller::PIDcontroller(Gains gains_in, Flight_Mode& mode_in) 
-    : gains{gains_in}, flight_mode{mode_in} { }
+PIDcontroller::PIDcontroller(const Gains& forward_in, const Gains& slow_in,
+                            const Gains& vertical_in, const Flight_Mode& mode_in) 
+    : forward_gains{forward_in},
+        slow_gains{slow_in},
+        vertical_gains{vertical_in}, 
+        flight_mode{mode_in} { }
 
 float PIDcontroller::calculate(float error)
 {
     static bool start = true;
 
-    float p, i, d, i_max;
-
-    switch (flight_mode)
-    {
-    case Flight_Mode::VERTICAL:
-        p = gains.p_vertical;
-        i = gains.i_vertical;
-        d = gains.d_vertical;
-        i_max = gains.i_max_vertical;
-        break;
-    
-    case Flight_Mode::SLOW:
-        p = gains.p_slow;
-        i = gains.i_slow;
-        d = gains.d_slow;
-        i_max = gains.i_max_slow;
-        break;
-
-    case Flight_Mode::FORWARD:
-        p = gains.p_forward;
-        i = gains.i_forward;
-        d = gains.d_forward;
-        i_max = gains.i_max_forward;
-        break;
-    }
+    const Gains& gains = select_gains();
 
     if (start)
     {
@@ -45,15 +25,31 @@ float PIDcontroller::calculate(float error)
         uint16_t t_delta = micros() - timer;
         timer = micros();
 
-        float output = p * error;
+        float output = gains.p * error;
 
         i_output += (t_delta / MICROSEC_PER_SEC) * error;
-        i_output = constrain(i_output, (-1 * i_max) / i, i_max / i);
+        i_output = constrain(i_output, (-1 * gains.i_max) / gains.i, gains.i_max / gains.i);
 
-        output += constrain(i * i_output, -1 * i_max, i_max);
-        output += d * ((error - prev_error) / t_delta) * MICROSEC_PER_SEC;
+        output += constrain(gains.i * i_output, -1 * gains.i_max, gains.i_max);
+        output += gains.d * ((error - prev_error) / t_delta) * MICROSEC_PER_SEC;
         prev_error = error;
 
         return constrain(output, -1 * PID_MAX_OUTPUT, PID_MAX_OUTPUT);
     }
+}
+
+const PIDcontroller::Gains& PIDcontroller::select_gains()
+{
+    if (flight_mode == Flight_Mode::FORWARD ||
+        flight_mode == Flight_Mode::TO_SLOW ||
+        flight_mode == Flight_Mode::TO_FORWARD)
+    {
+        return forward_gains;
+    }
+    else if (flight_mode == Flight_Mode::SLOW ||
+        flight_mode == Flight_Mode::TO_VERTICAL)
+    {
+        return slow_gains;
+    }
+    return vertical_gains;
 }

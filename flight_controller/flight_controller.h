@@ -111,6 +111,14 @@
 #define TILT_TRANSITION_DAMPER 10
 #define TILT_TRANSITION_THRESHOLD 1700
 
+
+#define TRANSITION_TIME 50 // 20 millisecond units
+
+// #define FORWARD_TRANSITION_TIME 3000 // milliseconds
+// #define SLOW_TRANSITION_TIME 3000
+// #define VERTICAL_TRANSITION_TIME 3000
+
+
 // Three position switch thresholds
 #define SWITCH_POS1 1300
 #define SWITCH_POS2 1700
@@ -120,21 +128,39 @@
 
 enum class Control_Mode : uint8_t { MANUAL, RATE, AUTOLEVEL };
 
-const PIDcontroller::Gains ROLL_PID_GAINS {
-    ROLL_P_FORWARD, ROLL_I_FORWARD, ROLL_D_FORWARD, ROLL_I_MAX_FORWARD,
-    ROLL_P_SLOW, ROLL_I_SLOW, ROLL_D_SLOW, ROLL_I_MAX_SLOW,
+const PIDcontroller::Gains FORWARD_ROLL_GAINS {
+    ROLL_P_FORWARD, ROLL_I_FORWARD, ROLL_D_FORWARD, ROLL_I_MAX_FORWARD
+};
+
+const PIDcontroller::Gains SLOW_ROLL_GAINS {
+    ROLL_P_SLOW, ROLL_I_SLOW, ROLL_D_SLOW, ROLL_I_MAX_SLOW
+};
+
+const PIDcontroller::Gains VERTICAL_ROLL_GAINS {
     ROLL_P_VERTICAL, ROLL_I_VERTICAL, ROLL_D_VERTICAL, ROLL_I_MAX_VERTICAL
 };
 
-const PIDcontroller::Gains PITCH_PID_GAINS {
-    PITCH_P_FORWARD, PITCH_I_FORWARD, PITCH_D_FORWARD, PITCH_I_MAX_FORWARD,
-    PITCH_P_SLOW, PITCH_I_SLOW, PITCH_D_SLOW, PITCH_I_MAX_SLOW,
+const PIDcontroller::Gains FORWARD_PITCH_GAINS {
+    PITCH_P_FORWARD, PITCH_I_FORWARD, PITCH_D_FORWARD, PITCH_I_MAX_FORWARD
+};
+
+const PIDcontroller::Gains SLOW_PITCH_GAINS {
+    PITCH_P_SLOW, PITCH_I_SLOW, PITCH_D_SLOW, PITCH_I_MAX_SLOW
+};
+
+const PIDcontroller::Gains VERTICAL_PITCH_GAINS {
     PITCH_P_VERTICAL, PITCH_I_VERTICAL, PITCH_D_VERTICAL, PITCH_I_MAX_VERTICAL
 };
 
-const PIDcontroller::Gains YAW_PID_GAINS {
-    YAW_P_FORWARD, YAW_I_FORWARD, YAW_D_FORWARD, YAW_I_MAX_FORWARD,
-    YAW_P_SLOW, YAW_I_SLOW, YAW_D_SLOW, YAW_I_MAX_SLOW,
+const PIDcontroller::Gains FORWARD_YAW_GAINS {
+    YAW_P_FORWARD, YAW_I_FORWARD, YAW_D_FORWARD, YAW_I_MAX_FORWARD
+};
+
+const PIDcontroller::Gains SLOW_YAW_GAINS {
+    YAW_P_SLOW, YAW_I_SLOW, YAW_D_SLOW, YAW_I_MAX_SLOW
+};
+
+const PIDcontroller::Gains VERTICAL_YAW_GAINS {
     YAW_P_VERTICAL, YAW_I_VERTICAL, YAW_D_VERTICAL, YAW_I_MAX_VERTICAL
 };
 
@@ -169,6 +195,7 @@ public:
 
     Control_Mode get_control_mode();
     Flight_Mode get_flight_mode();
+    int16_t get_transition_state();
 
 private:
     void determine_mode(Input& input);
@@ -180,16 +207,18 @@ private:
 
     Imu imu{ LED_BUILTIN };
 
-    Flight_Mode flight_mode;
-    Control_Mode control_mode;
+    Flight_Mode flight_mode = Flight_Mode::SLOW;
+    Control_Mode control_mode = Control_Mode::MANUAL;
 
-    PIDcontroller roll_pid{ ROLL_PID_GAINS, flight_mode };
-    PIDcontroller pitch_pid{ PITCH_PID_GAINS, flight_mode };
-    PIDcontroller yaw_pid{ YAW_PID_GAINS, flight_mode };
+    PIDcontroller roll_pid{ FORWARD_ROLL_GAINS, SLOW_ROLL_GAINS, VERTICAL_ROLL_GAINS, flight_mode };
+    PIDcontroller pitch_pid{ FORWARD_PITCH_GAINS, SLOW_PITCH_GAINS, VERTICAL_PITCH_GAINS, flight_mode };
+    PIDcontroller yaw_pid{ FORWARD_YAW_GAINS, SLOW_YAW_GAINS, VERTICAL_YAW_GAINS, flight_mode };
 
     float target_roll = 0;
     float target_pitch = 0;
     float target_yaw = 0;
+
+    int16_t transition_state = 0;
 
     uint16_t right_tilt_last = NEUTRAL_STICK;
     uint16_t left_tilt_last = NEUTRAL_STICK;

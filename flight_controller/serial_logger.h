@@ -84,7 +84,9 @@
 #ifdef PRINT_FLIGHT_MODE
 #define DO_LOGGING
 #define print_flight_mode() \
-    Serial.println((uint8_t)flight_controller.get_flight_mode());
+    Serial.print((uint8_t)flight_controller.get_flight_mode()); \
+    Serial.print(' '); \
+    Serial.println(flight_controller.get_transition_state());
 #else 
 #define print_flight_mode()
 #endif

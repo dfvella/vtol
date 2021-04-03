@@ -8,25 +8,31 @@
 #define PID_INITIAL_OUTPUT 1500
 #define PID_MAX_OUTPUT 500
 
-enum class Flight_Mode : uint8_t { FORWARD, SLOW, VERTICAL };
+enum class Flight_Mode : uint8_t { TO_FORWARD, FORWARD, TO_SLOW, SLOW, TO_VERTICAL, VERTICAL };
 
 class PIDcontroller
 {
 public:
     struct Gains
     {
-        float p_forward, i_forward, d_forward, i_max_forward;
-        float p_slow, i_slow, d_slow, i_max_slow;
-        float p_vertical, i_vertical, d_vertical, i_max_vertical;
+        float p;
+        float i;
+        float d;
+        float i_max;
     };
 
-    PIDcontroller(Gains gains_in, Flight_Mode& mode_in);
+    PIDcontroller(const Gains& forward_in, const Gains& slow_in, 
+                const Gains& vertical_in, const Flight_Mode& mode_in);
     float calculate(float error);
 
 private:
-    Gains gains;
+    const Gains& select_gains();
 
-    Flight_Mode& flight_mode;
+    const Gains& forward_gains;
+    const Gains& slow_gains;
+    const Gains& vertical_gains;
+
+    const Flight_Mode& flight_mode;
 
     float i_output, prev_output, prev_error;
 
