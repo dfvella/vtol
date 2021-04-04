@@ -230,11 +230,11 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
         output.elevator = NEUTRAL_STICK + (NEUTRAL_STICK - (int16_t)input.pitch);
     }
     else if (0 <= transition_state && transition_state < TRANSITION_TIME)
-    // currently in slow flight to transitioning to or from vertical flight
+    // currently in slow flight or transitioning to or from vertical flight
     {
         // add aileron into mix thrust differential
-        output.right_motor = input.throttle + (SLOW_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
-        output.left_motor = input.throttle - (SLOW_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
+        output.right_motor = input.throttle - (SLOW_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
+        output.left_motor = input.throttle + (SLOW_YAW_DIFFERENTIAL * (NEUTRAL_STICK - (int16_t)input.yaw));
 
         output.right_alr = (2 * NEUTRAL_STICK) - (int16_t)input.roll + SLOW_FLAPS_TRIM;
         output.left_alr = (2 * NEUTRAL_STICK) - (int16_t)input.roll - SLOW_FLAPS_TRIM;
