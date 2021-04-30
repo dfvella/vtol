@@ -273,9 +273,11 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
 
         output.right_tilt += (VERTICAL_YAW_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.yaw));
         output.right_tilt += (VERTICAL_PITCH_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.pitch));
+        output.right_tilt -= VERTICAL_YAW_TRIM;
 
         output.left_tilt += (VERTICAL_YAW_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.yaw));
         output.left_tilt -= (VERTICAL_PITCH_MOTOR_TILT * (NEUTRAL_STICK - (int16_t)input.pitch));
+        output.left_tilt -= VERTICAL_YAW_TRIM;
 
         output.elevator = NEUTRAL_STICK + (NEUTRAL_STICK - (int16_t)input.pitch);
     }

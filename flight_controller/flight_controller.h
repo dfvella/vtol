@@ -26,6 +26,7 @@
 #define VERTICAL_FLAPS_TRIM -100
 #define VERTICAL_RIGHT_TILT 1860
 #define VERTICAL_LEFT_TILT 1250
+#define VERTICAL_YAW_TRIM 40
 
 // autolevel attitude limits
 #define AUTO_MAX_ROLL_ANGLE 40
