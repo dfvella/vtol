@@ -130,6 +130,25 @@ void Flight_Controller::determine_mode(Input& input)
 
 void Flight_Controller::calculate_pids(Input& input, Input& output)
 {
+    float roll_error = imu.roll() - target_roll;
+    float pitch_error = imu.pitch() - target_pitch;
+    float yaw_error = imu.yaw() - target_yaw;
+
+    if (roll_error > 180)
+        roll_error -= 360;
+    else if (roll_error < -180)
+        roll_error += 360;
+
+    if (pitch_error > 180)
+        pitch_error -= 360;
+    else if (pitch_error < -180)
+        pitch_error += 360;
+
+    if (yaw_error > 180)
+        yaw_error -= 360;
+    else if (yaw_error < -180)
+        yaw_error += 360;
+
     calculate_targets(input);
 
     output.throttle = input.throttle;
@@ -143,10 +162,9 @@ void Flight_Controller::calculate_pids(Input& input, Input& output)
         break;
 
     default:
-        // add separate pid controllers for different flight modes
-        output.roll = (uint16_t)roll_pid.calculate(imu.roll() - target_roll + ROLL_PID_TRIM) + NEUTRAL_STICK;
-        output.pitch = (uint16_t)pitch_pid.calculate(imu.pitch() - target_pitch + PITCH_PID_TRIM) + NEUTRAL_STICK;
-        output.yaw = (uint16_t)yaw_pid.calculate(imu.yaw() - target_yaw + YAW_PID_TRIM) + NEUTRAL_STICK;
+        output.roll = (uint16_t)roll_pid.calculate(roll_error + ROLL_PID_TRIM) + NEUTRAL_STICK;
+        output.pitch = (uint16_t)pitch_pid.calculate(pitch_error + PITCH_PID_TRIM) + NEUTRAL_STICK;
+        output.yaw = (uint16_t)yaw_pid.calculate(yaw_error + YAW_PID_TRIM) + NEUTRAL_STICK;
         break;
     }
 }
