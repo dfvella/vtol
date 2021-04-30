@@ -10,22 +10,22 @@
 // forward control map gains
 #define FORWARD_YAW_DIFFERENTIAL 0.5
 #define FORWARD_RIGHT_TILT 940
-#define FORWARD_LEFT_TILT 2050
+#define FORWARD_LEFT_TILT 2120
 
 // slow control map gains
 #define SLOW_YAW_DIFFERENTIAL 0.1
 #define SLOW_ROLL_DIFFERENTIAL 0.1
 #define SLOW_FLAPS_TRIM -100
 #define SLOW_RIGHT_TILT 1500
-#define SLOW_LEFT_TILT 1500
+#define SLOW_LEFT_TILT 1570
 
 // vertical control map gains
-#define VERTICAL_ROLL_DIFFERENTIAL 0.4
-#define VERTICAL_YAW_MOTOR_TILT 0.6
-#define VERTICAL_PITCH_MOTOR_TILT 0.8
+#define VERTICAL_ROLL_DIFFERENTIAL 0.3
+#define VERTICAL_YAW_MOTOR_TILT 0.5
+#define VERTICAL_PITCH_MOTOR_TILT 0.5
 #define VERTICAL_FLAPS_TRIM -100
 #define VERTICAL_RIGHT_TILT 1860
-#define VERTICAL_LEFT_TILT 1220
+#define VERTICAL_LEFT_TILT 1250
 
 // autolevel attitude limits
 #define AUTO_MAX_ROLL_ANGLE 40
@@ -111,13 +111,8 @@
 #define TILT_TRANSITION_DAMPER 10
 #define TILT_TRANSITION_THRESHOLD 1700
 
-
+// time spent in the transition state between flight mode changes
 #define TRANSITION_TIME 50 // 20 millisecond units
-
-// #define FORWARD_TRANSITION_TIME 3000 // milliseconds
-// #define SLOW_TRANSITION_TIME 3000
-// #define VERTICAL_TRANSITION_TIME 3000
-
 
 // Three position switch thresholds
 #define SWITCH_POS1 1300
