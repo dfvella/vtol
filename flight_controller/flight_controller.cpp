@@ -193,9 +193,9 @@ void Flight_Controller::calculate_targets(Input& input)
         break;
 
     case Control_Mode::MANUAL:
-        target_roll = 0;
-        target_pitch = 0;
-        target_yaw = 0;
+        target_roll = imu.roll();
+        target_pitch = imu.pitch();
+        target_yaw = imu.yaw();
         break;
     }
 
