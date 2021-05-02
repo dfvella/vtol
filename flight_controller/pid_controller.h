@@ -8,6 +8,8 @@
 #define PID_INITIAL_OUTPUT 1500
 #define PID_MAX_OUTPUT 500
 
+#define FIR_BUFFER_SIZE 10
+
 enum class Flight_Mode : uint8_t { TO_FORWARD, FORWARD, TO_SLOW, SLOW, TO_VERTICAL, VERTICAL };
 
 class PIDcontroller
@@ -37,6 +39,31 @@ private:
     float i_output, prev_output, prev_error;
 
     unsigned long timer;
+
+    class FIR_Filter {
+    public:
+        FIR_Filter(float* response_in);
+        FIR_Filter(const FIR_Filter& other);
+        FIR_Filter& operator=(const FIR_Filter& other);
+        ~FIR_Filter();
+
+        float calculate(float input);
+        void flush();
+
+    private:
+        const float* response;
+
+        float* buffer;
+        size_t front;
+    };
+
+    float d_response[FIR_BUFFER_SIZE] = {
+        //1, 0, 0, 0, 0, 0, 0, 0, 0, 0 // no filter
+        0.4, 0.3, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 // delay <20 ms
+        //0.3, 0.3, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 // delay ~25 ms
+    };
+
+    FIR_Filter d_filter;
 };
 
 #endif // PID_CONTROLLER_H

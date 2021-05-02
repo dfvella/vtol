@@ -1,11 +1,13 @@
 #include "pid_controller.h"
 
 PIDcontroller::PIDcontroller(const Gains& forward_in, const Gains& slow_in,
-                            const Gains& vertical_in, const Flight_Mode& mode_in) 
-    : forward_gains{forward_in},
-        slow_gains{slow_in},
-        vertical_gains{vertical_in}, 
-        flight_mode{mode_in} { }
+                    const Gains& vertical_in, const Flight_Mode& mode_in) :
+    forward_gains{forward_in},
+    slow_gains{slow_in},
+    vertical_gains{vertical_in}, 
+    flight_mode{mode_in},
+    d_filter{d_response}
+{ }
 
 float PIDcontroller::calculate(float error)
 {
@@ -18,6 +20,8 @@ float PIDcontroller::calculate(float error)
         timer = micros();
         start = false;
 
+        d_filter.flush();
+
         return PID_INITIAL_OUTPUT;
     }
     else 
@@ -29,9 +33,11 @@ float PIDcontroller::calculate(float error)
 
         i_output += (t_delta / MICROSEC_PER_SEC) * error;
         i_output = constrain(i_output, (-1 * gains.i_max) / gains.i, gains.i_max / gains.i);
-
         output += constrain(gains.i * i_output, -1 * gains.i_max, gains.i_max);
-        output += gains.d * ((error - prev_error) / t_delta) * MICROSEC_PER_SEC;
+
+        float d_error = d_filter.calculate((error - prev_error) / (t_delta / MICROSEC_PER_SEC));
+
+        output += gains.d * d_error;
         prev_error = error;
 
         return constrain(output, -1 * PID_MAX_OUTPUT, PID_MAX_OUTPUT);
@@ -52,4 +58,67 @@ const PIDcontroller::Gains& PIDcontroller::select_gains()
         return slow_gains;
     }
     return vertical_gains;
+}
+
+PIDcontroller::FIR_Filter::FIR_Filter(float* response_in) :
+    response{ response_in },
+    buffer{ new float[FIR_BUFFER_SIZE] },
+    front{ 0 }
+{ }
+
+PIDcontroller::FIR_Filter::FIR_Filter(const FIR_Filter& other) :
+    response{ other.response },
+    buffer{ new float[FIR_BUFFER_SIZE] },
+    front{ other.front }
+{
+    for (size_t i = 0; i < FIR_BUFFER_SIZE; ++i)
+    {
+        buffer[i] = other.buffer[i];
+    }
+}
+
+PIDcontroller::FIR_Filter& PIDcontroller::FIR_Filter::operator=(const FIR_Filter& other)
+{
+    response = other.response;
+    front = other.front;
+
+    for (size_t i = 0; i < FIR_BUFFER_SIZE; ++i)
+    {
+        buffer[i] = other.buffer[i];
+    }
+
+    return *this;
+}
+
+PIDcontroller::FIR_Filter::~FIR_Filter()
+{
+    delete[] buffer;
+}
+
+float PIDcontroller::FIR_Filter::calculate(float input)
+{
+    float result = 0;
+
+    front = (front + 1) % FIR_BUFFER_SIZE;
+
+    buffer[front] = input;
+
+    for (size_t i = 0; i < FIR_BUFFER_SIZE; ++i)
+    {
+        int buffer_index = front - i;
+        if (buffer_index < 0)
+        {
+            buffer_index += FIR_BUFFER_SIZE;
+        }
+        result += buffer[buffer_index] * response[i];
+    }
+    return result;
+}
+
+void PIDcontroller::FIR_Filter::flush()
+{
+    for (size_t i = 0; i < FIR_BUFFER_SIZE; ++i)
+    {
+        buffer[i] = 0;
+    }
 }
