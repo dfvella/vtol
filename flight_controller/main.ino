@@ -41,7 +41,7 @@ void setup()
     pinMode(LED_BUILTIN, OUTPUT);
 
     #ifdef SERIAL_CONNECTION
-    Serial.begin(9600);
+    Serial.begin(SERIAL_BAUD_RATE);
     Serial.println("Serial connection");
     #endif
 
@@ -60,6 +60,10 @@ void setup()
     digitalWrite(LED_BUILTIN, LOW);
 
     timer = micros();
+
+    #ifdef SERIAL_CONNECTION
+    Serial.println("setup complete");
+    #endif
 }
 
 void loop() 
@@ -103,6 +107,10 @@ void loop()
         pwm_scheduler.set_signal(pwmScheduler::LALR_IND, controller_output.left_alr);
         pwm_scheduler.set_signal(pwmScheduler::ELE_IND, controller_output.elevator);
 
+        #ifdef DO_LOGGING_50HZ
+        print_log()
+        #endif
+
         state = Controller_State::SERVOWRITE;
         break;
 
@@ -115,7 +123,7 @@ void loop()
         break;
     }
 
-    #ifdef DO_LOGGING
+    #ifdef DO_LOGGING_200HZ
     print_log()
     #endif
 
