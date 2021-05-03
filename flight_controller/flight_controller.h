@@ -24,8 +24,8 @@
 #define VERTICAL_YAW_MOTOR_TILT 0.5
 #define VERTICAL_PITCH_MOTOR_TILT 0.5
 #define VERTICAL_FLAPS_TRIM -100
-#define VERTICAL_RIGHT_TILT 1860
-#define VERTICAL_LEFT_TILT 1250
+#define VERTICAL_RIGHT_TILT 1850
+#define VERTICAL_LEFT_TILT 1260
 #define VERTICAL_YAW_TRIM 40
 
 // autolevel attitude limits
@@ -43,19 +43,19 @@
 #define NEUTRAL_THROTTLE 1000
 
 // vertical mode pid gains
-#define ROLL_P_VERTICAL 7 // was 8
+#define ROLL_P_VERTICAL 10 // was 7
 #define ROLL_I_VERTICAL 0
-#define ROLL_D_VERTICAL 1 // was 1.2
+#define ROLL_D_VERTICAL 4 // was 3
 #define ROLL_I_MAX_VERTICAL 1
 
-#define PITCH_P_VERTICAL 7 // was 8
+#define PITCH_P_VERTICAL 11 // was 13
 #define PITCH_I_VERTICAL 0
-#define PITCH_D_VERTICAL 1 // was 1.2
-#define PITCH_I_MAX_VERTICAL 70
+#define PITCH_D_VERTICAL 6 // was 4
+#define PITCH_I_MAX_VERTICAL 1
 
-#define YAW_P_VERTICAL 1.7 // was 2
+#define YAW_P_VERTICAL 8 // was 6
 #define YAW_I_VERTICAL 0
-#define YAW_D_VERTICAL 0.6 // was 0.1
+#define YAW_D_VERTICAL 3 // was 2
 #define YAW_I_MAX_VERTICAL 1
 
 // slow mode pid gains
