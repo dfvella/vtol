@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
-#include "ppm_decoder.h"
+//#include "ppm_decoder.h"
+#include "radio_driver.h"
 #include "pwm_driver.h"
 #include "flight_controller.h"
 
@@ -9,7 +10,7 @@
 #define ENABLE_SERVOS
 
 // Pin assignments
-#define PPM_PIN 3
+#define RADIO_PIN 3
 #define RIGHT_MOTOR_PIN 4
 #define RIGHT_TILT_PIN 5
 #define RIGHT_ALR_PIN 6
@@ -21,7 +22,7 @@
 unsigned long timer = 0;
 const int LOOP_TIME = 5000; // microseconds
 
-ppmDecoder ppm;
+Radio radio(RADIO_PIN);
 
 pwmDevice right_motor{ RIGHT_MOTOR_PIN, RIGHT_MOTOR_MIN_PULSE, RIGHT_MOTOR_MAX_PULSE };
 pwmDevice right_tilt{ RIGHT_TILT_PIN, RIGHT_TILT_MIN_PULSE, RIGHT_TILT_MAX_PULSE };
@@ -47,7 +48,7 @@ void setup()
 
     flight_controller.begin();
 
-    assignPpmDecoderToPin(ppm, PPM_PIN);
+    radio.begin();
 
     pwm_scheduler.add_device(pwmScheduler::RESC_IND, &right_motor);
     pwm_scheduler.add_device(pwmScheduler::RTILT_IND, &right_tilt);
@@ -70,6 +71,7 @@ void loop()
 {
     static Controller_State state = Controller_State::PPMSYNC;
 
+    static Flight_Controller::Input controller_input;
     static Flight_Controller::Output controller_output;
 
     flight_controller.run();
@@ -77,23 +79,20 @@ void loop()
     switch (state)
     {
     case Controller_State::PPMSYNC:
-        ppm.sync();
+        controller_input = {
+            radio.thr(),
+            radio.arl(),
+            radio.ele(),
+            radio.rud(),
+            radio.ger(),
+            radio.aux()
+        };
 
         state = Controller_State::PIDCALC;
         break;
 
     case Controller_State::PIDCALC:
-        {
-            Flight_Controller::Input input = {
-                ppm.get(ppmDecoder::THR),
-                ppm.get(ppmDecoder::ARL),
-                ppm.get(ppmDecoder::ELE),
-                ppm.get(ppmDecoder::RUD),
-                ppm.get(ppmDecoder::GER),
-                ppm.get(ppmDecoder::AUX)
-            };
-            flight_controller.calculate_outputs(input, controller_output);
-        }
+        flight_controller.calculate_outputs(controller_input, controller_output);
 
         state = Controller_State::SERVOSET;
         break;
