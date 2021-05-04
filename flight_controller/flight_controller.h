@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 #include "imu_driver.h"
-#include "pwm_driver.h"
+#include "pwm_schedular.h"
 #include "pid_controller.h"
 
 // forward control map gains
