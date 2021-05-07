@@ -9,11 +9,18 @@
 //#define PRINT_ROLL_ANGLE
 //#define PRINT_PITCH_ANGLE
 //#define PRINT_YAW_ANGLE
+//#define PRINT_TARGET_ROLL
+//#define PRINT_TARGET_PITCH
+//#define PRINT_TARGET_YAW
+//#define PRINT_ROLL_ERROR
+//#define PRINT_PITCH_ERROR
+//#define PRINT_YAW_ERROR
 // or uncomment one or more of the following:
 //#define PRINT_LOOP_TIME
 //#define PRINT_IMU_ANGLES
 //#define PRINT_PPM_INPUTS
 //#define PRINT_CONTROLLER_TARGETS
+//#define PRINT_CONTROLLER_ERROR
 //#define PRINT_CONTROLLER_OUTPUTS
 //#define PRINT_FLIGHT_MODE
 //#define PRINT_CONTROL_MODE
@@ -87,6 +94,30 @@
     #define print_ppm_inputs()
 #endif
 
+#ifdef PRINT_TARGET_ROLL
+    #define DO_LOGGING
+    #define print_target_roll() \
+        Serial.print(flight_controller.get_target_roll());
+#else
+    #define print_target_roll()
+#endif
+
+#ifdef PRINT_TARGET_PITCH
+    #define DO_LOGGING
+    #define print_target_pitch() \
+        Serial.print(flight_controller.get_target_pitch());
+#else
+    #define print_target_pitch()
+#endif
+
+#ifdef PRINT_TARGET_YAW
+    #define DO_LOGGING
+    #define print_target_yaw() \
+        Serial.print(flight_controller.get_target_yaw());
+#else
+    #define print_target_yaw()
+#endif
+
 #ifdef PRINT_CONTROLLER_TARGETS
     #define DO_LOGGING
     #define print_controller_targets() \
@@ -98,6 +129,43 @@
         Serial.print(' ');
 #else 
     #define print_controller_targets()
+#endif
+
+#ifdef PRINT_ROLL_ERROR
+    #define DO_LOGGING
+    #define print_roll_error() \
+        Serial.print(flight_controller.get_roll_error());
+#else
+    #define print_roll_error()
+#endif
+
+#ifdef PRINT_PITCH_ERROR
+    #define DO_LOGGING
+    #define print_pitch_error() \
+        Serial.print(flight_controller.get_pitch_error());
+#else
+    #define print_pitch_error()
+#endif
+
+#ifdef PRINT_YAW_ERROR
+    #define DO_LOGGING
+    #define print_yaw_error() \
+        Serial.print(flight_controller.get_yaw_error());
+#else
+    #define print_yaw_error()
+#endif
+
+#ifdef PRINT_CONTROLLER_ERROR
+    #define DO_LOGGING
+    #define print_controller_error() \
+        Serial.print(flight_controller.get_roll_error()); \
+        Serial.print(' '); \
+        Serial.print(flight_controller.get_pitch_error()); \
+        Serial.print(' '); \
+        Serial.print(flight_controller.get_yaw_angle()); \
+        Serial.print(' ');
+#else
+    #define print_controller_error()
 #endif
 
 #ifdef PRINT_CONTROLLER_OUTPUTS
@@ -148,7 +216,14 @@
     print_loop_time() \
     print_imu_angles() \
     print_ppm_inputs() \
+    print_target_roll() \
+    print_target_pitch() \
+    print_target_yaw() \
     print_controller_targets() \
+    print_roll_error() \
+    print_pitch_error() \
+    print_yaw_error() \
+    print_controller_error() \
     print_controller_outputs() \
     print_flight_mode() \
     print_control_mode() \

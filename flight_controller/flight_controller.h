@@ -185,6 +185,10 @@ public:
     float get_target_pitch();
     float get_target_yaw();
 
+    float get_roll_error();
+    float get_pitch_error();
+    float get_yaw_error();
+
     float get_roll_angle();
     float get_pitch_angle();
     float get_yaw_angle();
@@ -209,6 +213,18 @@ private:
     PIDcontroller roll_pid{ FORWARD_ROLL_GAINS, SLOW_ROLL_GAINS, VERTICAL_ROLL_GAINS, flight_mode };
     PIDcontroller pitch_pid{ FORWARD_PITCH_GAINS, SLOW_PITCH_GAINS, VERTICAL_PITCH_GAINS, flight_mode };
     PIDcontroller yaw_pid{ FORWARD_YAW_GAINS, SLOW_YAW_GAINS, VERTICAL_YAW_GAINS, flight_mode };
+
+    FIR_Filter::Response target_response = {
+        //0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0
+        0.3, 0.2, 0.2, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0
+        //0.3, 0.3, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        //0.5, 0.3, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+        //1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+    };
+
+    FIR_Filter target_roll_filter{ target_response };
+    FIR_Filter target_pitch_filter{ target_response };
+    FIR_Filter target_yaw_filter{ target_response };
 
     float target_roll = 0;
     float target_pitch = 0;

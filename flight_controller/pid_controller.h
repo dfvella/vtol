@@ -12,6 +12,27 @@
 
 enum class Flight_Mode : uint8_t { TO_FORWARD, FORWARD, TO_SLOW, SLOW, TO_VERTICAL, VERTICAL };
 
+class FIR_Filter {
+public:
+    using Response = float[FIR_BUFFER_SIZE];
+
+    FIR_Filter(float* response_in);
+    FIR_Filter(const FIR_Filter& other);
+    FIR_Filter& operator=(const FIR_Filter& other);
+    ~FIR_Filter();
+
+    float calculate(float input);
+    void flush();
+
+private:
+    const float* response;
+
+    float* buffer;
+    size_t front;
+
+    uint8_t startup_counter;
+};
+
 class PIDcontroller
 {
 public:
@@ -27,6 +48,8 @@ public:
                 const Gains& vertical_in, const Flight_Mode& mode_in);
     float calculate(float error);
 
+    float get_error();
+
 private:
     const Gains& select_gains();
 
@@ -40,24 +63,7 @@ private:
 
     unsigned long timer;
 
-    class FIR_Filter {
-    public:
-        FIR_Filter(float* response_in);
-        FIR_Filter(const FIR_Filter& other);
-        FIR_Filter& operator=(const FIR_Filter& other);
-        ~FIR_Filter();
-
-        float calculate(float input);
-        void flush();
-
-    private:
-        const float* response;
-
-        float* buffer;
-        size_t front;
-    };
-
-    float d_response[FIR_BUFFER_SIZE] = {
+    FIR_Filter::Response d_response = {
         //1, 0, 0, 0, 0, 0, 0, 0, 0, 0 // no filter
         0.4, 0.3, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 // delay <20 ms
         //0.3, 0.3, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 // delay ~25 ms

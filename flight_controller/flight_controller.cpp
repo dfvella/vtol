@@ -130,6 +130,8 @@ void Flight_Controller::determine_mode(Input& input)
 
 void Flight_Controller::calculate_pids(Input& input, Input& output)
 {
+    calculate_targets(input);
+
     float roll_error = imu.roll() - target_roll;
     float pitch_error = imu.pitch() - target_pitch;
     float yaw_error = imu.yaw() - target_yaw;
@@ -148,8 +150,6 @@ void Flight_Controller::calculate_pids(Input& input, Input& output)
         yaw_error -= 360;
     else if (yaw_error < -180)
         yaw_error += 360;
-
-    calculate_targets(input);
 
     output.throttle = input.throttle;
 
@@ -198,6 +198,10 @@ void Flight_Controller::calculate_targets(Input& input)
         target_yaw = imu.yaw();
         break;
     }
+
+    target_roll = target_roll_filter.calculate(target_roll);
+    target_pitch = target_pitch_filter.calculate(target_pitch);
+    target_yaw = target_yaw_filter.calculate(target_yaw);
 
     // currently inverted flight not possible in rate mode
     if (target_pitch > 60)
@@ -315,7 +319,7 @@ void Flight_Controller::map_outputs(Input& input, Output& output)
         uint16_t right_tilt_damper;
         uint16_t left_tilt_damper;
 
-        if (transition_state < 0) // tile position currently between slow and forward
+        if (transition_state < 0) // tilt position currently between slow and forward
         {
             right_tilt_damper = (SLOW_RIGHT_TILT - FORWARD_RIGHT_TILT) / TRANSITION_TIME;
             left_tilt_damper = (FORWARD_LEFT_TILT - SLOW_LEFT_TILT) / TRANSITION_TIME;
@@ -346,6 +350,21 @@ float Flight_Controller::get_target_pitch()
 float Flight_Controller::get_target_yaw()
 {
     return target_yaw;
+}
+
+float Flight_Controller::get_roll_error()
+{
+    return roll_pid.get_error();
+}
+
+float Flight_Controller::get_pitch_error()
+{
+    return pitch_pid.get_error();
+}
+
+float Flight_Controller::get_yaw_error()
+{
+    return yaw_pid.get_error();
 }
 
 float Flight_Controller::get_roll_angle()
