@@ -39,6 +39,10 @@ FIR_Filter::~FIR_Filter()
 
 float FIR_Filter::calculate(float input)
 {
+    front = (front + 1) % FIR_BUFFER_SIZE;
+
+    buffer[front] = input;
+
     if (startup_counter < FIR_BUFFER_SIZE)
     {
         ++startup_counter;
@@ -46,10 +50,6 @@ float FIR_Filter::calculate(float input)
     }
 
     float result = 0;
-
-    front = (front + 1) % FIR_BUFFER_SIZE;
-
-    buffer[front] = input;
 
     for (size_t i = 0; i < FIR_BUFFER_SIZE; ++i)
     {
@@ -65,10 +65,6 @@ float FIR_Filter::calculate(float input)
 
 void FIR_Filter::flush()
 {
-    for (size_t i = 0; i < FIR_BUFFER_SIZE; ++i)
-    {
-        buffer[i] = 0;
-    }
     startup_counter = 0;
 }
 
