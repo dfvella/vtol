@@ -31,11 +31,16 @@
 // autolevel attitude limits
 #define AUTO_MAX_ROLL_ANGLE 40
 #define AUTO_MAX_PITCH_ANGLE 40
+#define AUTO_MAX_YAW_RATE 2.5
+#define AUTO_MAX_YAW_ERROR 30
 
 // use different rates for different flight modes
-#define RATE_MAX_ROLL_RATE 1.0 // units: deg per 20 ms
-#define RATE_MAX_PITCH_RATE 0.5
-#define RATE_MAX_YAW_RATE 1.0
+#define RATE_MAX_ROLL_RATE 1.5 // units: deg per 20 ms
+#define RATE_MAX_PITCH_RATE 1.0
+#define RATE_MAX_YAW_RATE 2.5
+#define RATE_MAX_ROLL_ERROR 30
+#define RATE_MAX_PITCH_ERROR 30
+#define RATE_MAX_YAW_ERROR 30
 
 // for noise reduction
 #define DEAD_STICK 20 // microseconds
@@ -198,12 +203,15 @@ public:
     int16_t get_transition_state();
 
 private:
-    void determine_mode(Input& input);
+    void determine_flight_mode(const Input& input);
+    void determine_control_mode(const Input& input);
     void calculate_pids(Input& input, Input& output);
     void calculate_targets(Input& input);
     void map_outputs(Input& input, Output& output);
 
     float interpolate(float val, float min_from, float max_from, float min_to, float max_to);
+    float constrain_angle(float val);
+    float constrain_target(float val, float min_val, float max_val);
 
     Imu imu{ LED_BUILTIN };
 
@@ -214,7 +222,7 @@ private:
     PIDcontroller pitch_pid{ FORWARD_PITCH_GAINS, SLOW_PITCH_GAINS, VERTICAL_PITCH_GAINS, flight_mode };
     PIDcontroller yaw_pid{ FORWARD_YAW_GAINS, SLOW_YAW_GAINS, VERTICAL_YAW_GAINS, flight_mode };
 
-    FIR_Filter::Response target_response = {
+    FIR_Filter::Response input_response = {
         //0.2, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0
         0.3, 0.2, 0.2, 0.2, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0
         //0.3, 0.3, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
@@ -222,9 +230,9 @@ private:
         //1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
     };
 
-    FIR_Filter target_roll_filter{ target_response };
-    FIR_Filter target_pitch_filter{ target_response };
-    FIR_Filter target_yaw_filter{ target_response };
+    FIR_Filter input_roll_filter{ input_response };
+    FIR_Filter input_pitch_filter{ input_response };
+    FIR_Filter input_yaw_filter{ input_response };
 
     float target_roll = 0;
     float target_pitch = 0;
